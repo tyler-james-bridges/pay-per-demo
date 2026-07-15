@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Pay Per Demo
 
-## Getting Started
+An x402-gated virtual admission endpoint for Agentic Commerce Demo Day. A caller pays once in USDC on Base and receives confirmed admission without an account, API key, or subscription.
 
-First, run the development server:
+Built with Next.js and [`@agentcash/router`](https://github.com/merit-systems/agentcash-router).
+
+## Endpoint
+
+```text
+GET /api/demo
+```
+
+An unpaid request receives HTTP `402` with the x402 challenge in the `PAYMENT-REQUIRED` header. A paid request receives the event, payer, payment, and optional join URL details.
+
+Discovery is available at:
+
+- `GET /openapi.json`
+- `GET /llms.txt`
+
+## Setup
+
+Install dependencies and create your local environment file:
+
+```bash
+npm install
+cp .env.example .env.local
+```
+
+Set these required values in `.env.local`:
+
+- `EVM_PAYEE_ADDRESS`: Base wallet that receives USDC.
+- `CDP_API_KEY_ID`: Coinbase Developer Platform facilitator key ID.
+- `CDP_API_KEY_SECRET`: Coinbase Developer Platform facilitator secret.
+
+Optional configuration:
+
+- `DEMO_PRICE_USDC`: Defaults to `0.01`.
+- `DEMO_JOIN_URL`: HTTPS URL returned only after successful payment.
+
+Then run:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Call the paid endpoint with AgentCash:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npx agentcash fetch http://localhost:3000/api/demo
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Inspect the unpaid challenge with curl:
 
-## Learn More
+```bash
+curl -i http://localhost:3000/api/demo
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Verification
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm test
+npm run lint
+npm run format:check
+npm run typecheck
+npm run build
+```
