@@ -10,6 +10,7 @@
   --muted: #8d99a6;
   --green: #78e6ad;
   --amber: #f1c66d;
+  --blue: #7db9ff;
 }
 
 * {
@@ -111,6 +112,312 @@ a {
   color: var(--muted);
   font-size: 1rem;
   line-height: 1.65;
+}
+
+.commerce-workflow {
+  position: relative;
+  isolation: isolate;
+  padding: 2rem 1rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.workflow-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.workflow-heading h2 {
+  max-width: 18ch;
+  margin: 0.55rem 0 0;
+  font-size: clamp(1.45rem, 6vw, 2.25rem);
+  letter-spacing: -0.03em;
+}
+
+.workflow-heading button {
+  flex: 0 0 auto;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--green);
+  cursor: pointer;
+  font:
+    0.68rem ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+  text-transform: uppercase;
+}
+
+.workflow-heading button:hover,
+.workflow-heading button:focus-visible {
+  border-color: var(--green);
+  outline: none;
+}
+
+.actor-grid {
+  display: grid;
+  margin-top: 2rem;
+  border-top: 1px solid var(--line-strong);
+  border-left: 1px solid var(--line-strong);
+}
+
+.actor-node {
+  min-width: 0;
+  min-height: 8.5rem;
+  padding: 1rem;
+  border-right: 1px solid var(--line-strong);
+  border-bottom: 1px solid var(--line-strong);
+  background: var(--canvas);
+}
+
+.actor-node > span {
+  display: block;
+  margin-bottom: 1.2rem;
+  color: var(--muted);
+  font:
+    0.62rem ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+  text-transform: uppercase;
+}
+
+.actor-node strong {
+  display: block;
+  font-size: 0.9rem;
+}
+
+.actor-node p,
+.actor-node code {
+  display: block;
+  margin: 0.55rem 0 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.actor-human {
+  box-shadow: inset 3px 0 0 var(--amber);
+}
+
+.actor-agent {
+  box-shadow: inset 3px 0 0 var(--green);
+}
+
+.actor-host {
+  box-shadow: inset 3px 0 0 var(--blue);
+}
+
+.flow-stage {
+  position: relative;
+  margin-top: 1rem;
+  padding-top: 2.75rem;
+  overflow: hidden;
+}
+
+.flow-stage::before {
+  position: absolute;
+  top: 1.15rem;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: var(--line-strong);
+  content: "";
+}
+
+.flow-packet {
+  position: absolute;
+  z-index: 1;
+  top: 0.45rem;
+  left: 0;
+  width: 3.3rem;
+  padding: 0.25rem 0;
+  border: 1px solid var(--amber);
+  background: var(--surface);
+  color: var(--amber);
+  font:
+    0.58rem ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+  text-align: center;
+  animation: packet-run 5.5s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+.flow-steps {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+  border-left: 1px solid var(--line);
+  list-style: none;
+}
+
+.flow-steps li {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: 0.3rem 0.75rem;
+  padding: 0.8rem;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  opacity: 0.38;
+  animation: step-online 0.2s linear calc(var(--step) * 1.1s) forwards;
+}
+
+.flow-steps li > span {
+  grid-row: 1 / span 2;
+  color: var(--green);
+  font:
+    0.62rem ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+}
+
+.flow-steps strong {
+  font-size: 0.76rem;
+}
+
+.flow-steps code {
+  color: var(--muted);
+  font:
+    0.62rem ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+  overflow-wrap: anywhere;
+}
+
+.workflow-outcome {
+  display: grid;
+  margin-top: 1rem;
+  border: 1px solid var(--line-strong);
+  background: var(--canvas);
+}
+
+.workflow-outcome > div {
+  padding: 0.9rem;
+}
+
+.workflow-outcome > div + div {
+  border-top: 1px solid var(--line);
+}
+
+.workflow-outcome div > span:first-child {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--muted);
+  font:
+    0.6rem ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+  text-transform: uppercase;
+}
+
+.workflow-outcome strong {
+  font-size: 0.78rem;
+}
+
+.workflow-outcome .value-transfer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--amber);
+}
+
+.workflow-outcome .value-transfer > span:first-child {
+  margin: 0;
+  color: inherit;
+  font-size: 0.7rem;
+}
+
+.settlement-proof {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--line-strong);
+}
+
+.settlement-proof > div > strong {
+  display: block;
+  margin-top: 0.45rem;
+  font-size: 0.78rem;
+}
+
+.proof-status {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--muted);
+  font:
+    0.58rem ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+  text-transform: uppercase;
+}
+
+.proof-status i {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--green);
+}
+
+.settlement-proof dl {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.settlement-proof dt {
+  margin-bottom: 0.25rem;
+  color: var(--muted);
+  font:
+    0.56rem ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+  text-transform: uppercase;
+}
+
+.settlement-proof dd {
+  margin: 0;
+  font:
+    0.66rem ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+}
+
+.settlement-proof a {
+  color: var(--green);
+  text-underline-offset: 0.2em;
+}
+
+@keyframes packet-run {
+  from {
+    left: 0;
+  }
+
+  to {
+    left: calc(100% - 3.3rem);
+  }
+}
+
+@keyframes step-online {
+  to {
+    background: rgb(120 230 173 / 4%);
+    opacity: 1;
+  }
 }
 
 .workspace {
@@ -278,60 +585,6 @@ a {
   text-decoration: none;
 }
 
-.lifecycle {
-  padding: 2.5rem 1rem;
-  border-bottom: 1px solid var(--line);
-}
-
-.lifecycle > header {
-  margin-bottom: 1.5rem;
-}
-
-.lifecycle h2 {
-  margin: 0.55rem 0 0;
-  font-size: 1.5rem;
-}
-
-.lifecycle ol {
-  margin: 0;
-  padding: 0;
-  border-top: 1px solid var(--line);
-  list-style: none;
-}
-
-.lifecycle li {
-  display: grid;
-  grid-template-columns: 2rem minmax(0, 1fr);
-  gap: 0.75rem;
-  padding: 1rem 0;
-  border-bottom: 1px solid var(--line);
-}
-
-.lifecycle li > span {
-  color: var(--muted);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.65rem;
-}
-
-.lifecycle strong {
-  font-size: 0.82rem;
-}
-
-.lifecycle p {
-  margin: 0.3rem 0 0;
-  color: var(--muted);
-  font-size: 0.78rem;
-  line-height: 1.5;
-}
-
-.lifecycle code {
-  grid-column: 2;
-  align-self: center;
-  color: var(--green);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.68rem;
-}
-
 .footer {
   display: flex;
   flex-wrap: wrap;
@@ -353,9 +606,9 @@ a {
 @media (min-width: 760px) {
   .topbar,
   .intro,
+  .commerce-workflow,
   .request,
   .manifest,
-  .lifecycle,
   .footer {
     padding-right: 2rem;
     padding-left: 2rem;
@@ -364,6 +617,61 @@ a {
   .intro {
     padding-top: 5rem;
     padding-bottom: 4rem;
+  }
+
+  .commerce-workflow {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+
+  .workflow-heading {
+    flex-direction: row;
+    align-items: flex-end;
+  }
+
+  .actor-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .flow-steps {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .flow-steps li {
+    grid-template-columns: 1fr;
+    min-height: 6.5rem;
+  }
+
+  .flow-steps li > span {
+    grid-row: auto;
+  }
+
+  .workflow-outcome {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .workflow-outcome > div + div {
+    border-top: 0;
+    border-left: 1px solid var(--line);
+  }
+
+  .workflow-outcome > div:last-child {
+    text-align: right;
+  }
+
+  .workflow-outcome .value-transfer {
+    min-width: 9rem;
+  }
+
+  .settlement-proof {
+    grid-template-columns: minmax(14rem, 1fr) minmax(0, 2fr);
+    align-items: center;
+  }
+
+  .settlement-proof dl {
+    grid-template-columns: 1.4fr 0.7fr 1fr 0.8fr;
+    text-align: right;
   }
 
   .workspace {
@@ -385,19 +693,17 @@ a {
   .endpoint-meta {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
+}
 
-  .lifecycle {
-    padding-top: 3rem;
-    padding-bottom: 3rem;
+@media (prefers-reduced-motion: reduce) {
+  .flow-packet {
+    left: calc(100% - 3.3rem);
+    animation: none;
   }
 
-  .lifecycle li {
-    grid-template-columns: 2rem minmax(0, 1fr) minmax(10rem, 0.6fr);
-    align-items: center;
-  }
-
-  .lifecycle code {
-    grid-column: 3;
-    text-align: right;
+  .flow-steps li {
+    background: rgb(120 230 173 / 4%);
+    opacity: 1;
+    animation: none;
   }
 }

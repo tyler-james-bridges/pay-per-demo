@@ -1,8 +1,10 @@
 import { headers } from "next/headers";
 import Link from "next/link";
 
+import { CommerceWorkflow } from "@/app/workflow";
 import { demoPrice } from "@/lib/config";
 import { demoEvent } from "@/lib/demo";
+import { getLatestSettlement } from "@/lib/settlement";
 
 async function getOrigin() {
   if (process.env.BASE_URL) return process.env.BASE_URL;
@@ -19,6 +21,10 @@ async function getOrigin() {
 export default async function Home() {
   const origin = await getOrigin();
   const command = `npx agentcash fetch ${origin}/api/demo`;
+  const payee = process.env.EVM_PAYEE_ADDRESS;
+  const settlement = payee
+    ? await getLatestSettlement(payee).catch(() => null)
+    : null;
 
   return (
     <main className="shell">
@@ -41,6 +47,12 @@ export default async function Home() {
           operators. No account, API key, or recurring subscription.
         </p>
       </section>
+
+      <CommerceWorkflow
+        endpoint={`${origin}/api/demo`}
+        price={demoPrice}
+        settlement={settlement}
+      />
 
       <div className="workspace">
         <section className="request" aria-labelledby="endpoint-title">
@@ -119,50 +131,6 @@ export default async function Home() {
           </div>
         </aside>
       </div>
-
-      <section className="lifecycle" aria-labelledby="lifecycle-title">
-        <header>
-          <p className="panel-label">request lifecycle</p>
-          <h2 id="lifecycle-title">What the agent handles</h2>
-        </header>
-        <ol>
-          <li>
-            <span>01</span>
-            <div>
-              <strong>Request</strong>
-              <p>The agent calls the demo endpoint.</p>
-            </div>
-            <code>GET /api/demo</code>
-          </li>
-          <li>
-            <span>02</span>
-            <div>
-              <strong>Challenge</strong>
-              <p>The service returns the price and Base payment terms.</p>
-            </div>
-            <code>402 payment-required</code>
-          </li>
-          <li>
-            <span>03</span>
-            <div>
-              <strong>Payment</strong>
-              <p>AgentCash signs the USDC authorization and retries.</p>
-            </div>
-            <code>${demoPrice} USDC · Base</code>
-          </li>
-          <li>
-            <span>04</span>
-            <div>
-              <strong>Admission</strong>
-              <p>
-                The response confirms access and includes the configured join
-                URL.
-              </p>
-            </div>
-            <code>200 application/json</code>
-          </li>
-        </ol>
-      </section>
 
       <footer className="footer">
         <span>pay per demo</span>
