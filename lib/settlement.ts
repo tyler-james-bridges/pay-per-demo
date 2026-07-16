@@ -1,4 +1,5 @@
 const BASE_RPC_URL = "https://mainnet.base.org";
+const BLOCKSCOUT_API_URL = "https://base.blockscout.com/api/v2";
 const USDC_ADDRESS = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 const TRANSFER_TOPIC =
   "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
@@ -8,6 +9,16 @@ type RpcLog = {
   blockNumber: string;
   transactionHash: string;
   topics: string[];
+};
+
+type IndexedTransfer = {
+  block_number: number;
+  from: { hash: string };
+  timestamp: string;
+  to: { hash: string };
+  token: { address_hash: string; decimals: string };
+  total: { value: string };
+  transaction_hash: string;
 };
 
 export type Settlement = {
@@ -44,6 +55,20 @@ function addressTopic(address: string) {
   return `0x${address.toLowerCase().slice(2).padStart(64, "0")}`;
 }
 
+function formatTokenAmount(value: string, decimals: number) {
+  if (!Number.isInteger(decimals) || decimals < 0) {
+    throw new Error("Invalid token decimals");
+  }
+
+  const raw = BigInt(value);
+  if (decimals === 0) return raw.toString();
+
+  const padded = raw.toString().padStart(decimals + 1, "0");
+  const whole = padded.slice(0, -decimals);
+  const fraction = padded.slice(-decimals).replace(/0+$/, "");
+  return fraction ? `${whole}.${fraction}` : whole;
+}
+
 export function parseTransferLog(log: RpcLog, recipient: string) {
   if (log.topics[0]?.toLowerCase() !== TRANSFER_TOPIC) {
     throw new Error("Unexpected USDC event");
@@ -59,10 +84,8 @@ export function parseTransferLog(log: RpcLog, recipient: string) {
   }
 
   const payer = `0x${payerTopic.slice(-40)}`;
-  const amount = Number(BigInt(log.data)) / 1_000_000;
-
   return {
-    amount: amount.toFixed(2),
+    amount: formatTokenAmount(BigInt(log.data).toString(), 6),
     blockNumber: Number(BigInt(log.blockNumber)),
     payer,
     recipient,
@@ -70,7 +93,55 @@ export function parseTransferLog(log: RpcLog, recipient: string) {
   };
 }
 
-export async function getLatestSettlement(
+export function parseIndexedTransfer(
+  transfer: IndexedTransfer,
+  recipient: string,
+): Settlement {
+  if (
+    transfer.token.address_hash.toLowerCase() !== USDC_ADDRESS.toLowerCase()
+  ) {
+    throw new Error("Unexpected indexed token");
+  }
+  if (transfer.to.hash.toLowerCase() !== recipient.toLowerCase()) {
+    throw new Error("Unexpected indexed recipient");
+  }
+
+  const timestamp = new Date(transfer.timestamp);
+  if (Number.isNaN(timestamp.getTime())) throw new Error("Invalid timestamp");
+
+  return {
+    amount: formatTokenAmount(
+      transfer.total.value,
+      Number(transfer.token.decimals),
+    ),
+    blockNumber: transfer.block_number,
+    payer: transfer.from.hash,
+    recipient,
+    timestamp: timestamp.toISOString(),
+    transactionHash: transfer.transaction_hash,
+  };
+}
+
+async function getIndexedSettlement(recipient: string) {
+  const response = await fetch(
+    `${BLOCKSCOUT_API_URL}/addresses/${encodeURIComponent(recipient)}/token-transfers?type=ERC-20`,
+    { cache: "no-store" },
+  );
+  if (!response.ok) throw new Error("Blockscout request failed");
+
+  const payload = (await response.json()) as { items?: IndexedTransfer[] };
+  if (!Array.isArray(payload.items))
+    throw new Error("Invalid Blockscout response");
+
+  const transfer = payload.items.find(
+    (item) =>
+      item.token.address_hash.toLowerCase() === USDC_ADDRESS.toLowerCase() &&
+      item.to.hash.toLowerCase() === recipient.toLowerCase(),
+  );
+  return transfer ? parseIndexedTransfer(transfer, recipient) : null;
+}
+
+async function getRecentRpcSettlement(
   recipient: string,
 ): Promise<Settlement | null> {
   const latestHex = await rpc<string>("eth_blockNumber", []);
@@ -98,4 +169,17 @@ export async function getLatestSettlement(
     ...transfer,
     timestamp: new Date(Number(BigInt(block.timestamp)) * 1_000).toISOString(),
   };
+}
+
+export async function getLatestSettlement(
+  recipient: string,
+): Promise<Settlement | null> {
+  try {
+    const indexed = await getIndexedSettlement(recipient);
+    if (indexed) return indexed;
+  } catch {
+    return getRecentRpcSettlement(recipient);
+  }
+
+  return getRecentRpcSettlement(recipient);
 }

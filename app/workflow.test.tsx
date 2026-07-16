@@ -17,11 +17,7 @@ const settlement: Settlement = {
 describe("CommerceWorkflow", () => {
   it("renders the verified settlement and BaseScan proof", () => {
     const html = renderToStaticMarkup(
-      <CommerceWorkflow
-        endpoint="https://pay-per-demo.vercel.app/api/demo"
-        price="0.01"
-        settlement={settlement}
-      />,
+      <CommerceWorkflow price="0.01" settlement={settlement} />,
     );
 
     expect(html).toContain("0.01 USDC confirmed on Base");
@@ -32,9 +28,28 @@ describe("CommerceWorkflow", () => {
     );
   });
 
+  it("renders the protocol flow in order", () => {
+    const html = renderToStaticMarkup(
+      <CommerceWorkflow price="0.01" settlement={settlement} />,
+    );
+
+    const labels = ["Prompt", "402", "Pay", "Access"];
+
+    expect(html).toContain("Protocol flow");
+    expect(html).toContain("One prompt, one paid response.");
+    expect(html).toContain("0.01 USDC · Base");
+    expect(html).toContain("Private join URL");
+    expect(html).not.toContain("Replay");
+    labels.reduce((previousPosition, label) => {
+      const position = html.indexOf(`>${label}<`);
+      expect(position).toBeGreaterThan(previousPosition);
+      return position;
+    }, -1);
+  });
+
   it("does not render proof when Base data is unavailable", () => {
     const html = renderToStaticMarkup(
-      <CommerceWorkflow endpoint="/api/demo" price="0.01" settlement={null} />,
+      <CommerceWorkflow price="0.01" settlement={null} />,
     );
 
     expect(html).toContain("Settlement data is temporarily unavailable");

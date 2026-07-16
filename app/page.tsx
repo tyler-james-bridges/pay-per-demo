@@ -19,33 +19,6 @@ async function getOrigin() {
   return `${protocol}://${host}`;
 }
 
-const journey = [
-  {
-    step: "01",
-    title: "Discover",
-    description:
-      "Your agent reads the public OpenAPI and llms.txt instructions before it spends anything.",
-    stat: "No API key",
-    href: "/openapi.json",
-  },
-  {
-    step: "02",
-    title: "Pay",
-    description:
-      "It accepts the x402 challenge and settles exactly 0.01 USDC on Base.",
-    stat: "One request",
-    href: "#agent-command",
-  },
-  {
-    step: "03",
-    title: "Attend",
-    description:
-      "The paid response confirms admission and returns the private virtual join URL.",
-    stat: "No account",
-    href: "#event-title",
-  },
-] as const;
-
 export default async function Home() {
   const origin = await getOrigin();
   const endpoint = `${origin}/api/demo`;
@@ -56,8 +29,8 @@ export default async function Home() {
     ? `${priceInCents}¢`
     : `$${demoPrice}`;
   const agentPrompt =
-    `Attend ${demoEvent.name} for me. Use AgentCash at ${endpoint}. ` +
-    `Spend no more than ${demoPrice} USDC on Base and return the confirmed admission and private join URL.`;
+    `Use AgentCash: attend ${demoEvent.name} at ${endpoint}. ` +
+    `Max ${demoPrice} USDC on Base. Return admission + private join URL.`;
   const responsePreview = JSON.stringify(
     {
       admission: "confirmed",
@@ -71,7 +44,7 @@ export default async function Home() {
         currency: "USDC",
         network: "eip155:8453",
       },
-      joinUrl: "https://••••••",
+      joinUrl: "[redacted until payment]",
     },
     null,
     2,
@@ -139,31 +112,33 @@ export default async function Home() {
         </div>
       </header>
 
-      <section className="mx-auto max-w-5xl px-4 pt-16 pb-12 md:pt-24 md:pb-14">
+      <section className="mx-auto max-w-5xl px-4 pt-6 pb-4 md:pt-16 md:pb-10">
         <div className="text-center">
           <p className="text-[11px] font-bold tracking-[0.18em] text-white/50 uppercase">
             live service · agentic commerce demo day
           </p>
-          <h1 className="mt-5 text-5xl font-bold tracking-[-0.055em] md:text-7xl">
+          <h1 className="mt-4 text-5xl font-bold tracking-[-0.055em] md:text-7xl">
             pay-per-demo
           </h1>
-          <p className="mx-auto mt-5 max-w-2xl text-xl leading-relaxed text-white/60 md:text-2xl">
+          <p className="mx-auto mt-4 max-w-2xl text-xl leading-relaxed text-white/60 md:text-2xl">
             Send your agent to Demo Day for{" "}
             <strong className="font-bold text-green-400">{compactPrice}</strong>
             .
           </p>
-          <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-white/55">
+          <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-white/55">
             One prompt, one USDC payment, and one private join URL. No signup,
             subscription, or checkout flow.
           </p>
         </div>
       </section>
 
+      <CommerceWorkflow price={demoPrice} settlement={settlement} />
+
       <section
         className="mx-auto max-w-3xl px-4 pb-16"
         aria-labelledby="prompt-title"
       >
-        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5 md:p-6">
+        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4 md:p-6">
           <div className="flex items-center justify-between gap-4">
             <h2
               id="prompt-title"
@@ -176,7 +151,7 @@ export default async function Home() {
             </span>
           </div>
 
-          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-stretch">
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-start">
             <div className="min-w-0 flex-1 rounded-lg border border-white/20 bg-white/5 px-4 py-3 text-sm leading-relaxed text-white/75">
               <span className="mb-2 block text-[10px] tracking-wider text-white/50 uppercase">
                 human → agent
@@ -193,48 +168,12 @@ export default async function Home() {
               <span>✓ max spend set</span>
             </div>
             <a
-              className="text-xs text-white/50 transition-colors hover:text-white"
+              className="hidden text-xs text-white/50 transition-colors hover:text-white sm:inline"
               href="#agent-command"
             >
               Use the CLI instead →
             </a>
           </div>
-        </div>
-      </section>
-
-      <section
-        className="mx-auto max-w-5xl px-4 pb-16"
-        aria-labelledby="journey-title"
-      >
-        <h2
-          id="journey-title"
-          className="mb-6 text-xs font-bold tracking-wider text-white/50 uppercase"
-        >
-          How it works
-        </h2>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          {journey.map((item) => (
-            <a
-              className="group rounded-xl border border-white/10 bg-white/[0.02] p-6 no-underline transition-colors hover:border-white/25 hover:bg-white/[0.04]"
-              href={item.href}
-              key={item.step}
-            >
-              <div className="mb-4 flex items-start justify-between gap-4">
-                <h3 className="text-lg font-bold tracking-tight">
-                  {item.title}
-                </h3>
-                <span className="text-[10px] tracking-wider text-white/50 uppercase">
-                  {item.stat}
-                </span>
-              </div>
-              <p className="text-sm leading-relaxed text-white/55">
-                {item.description}
-              </p>
-              <span className="mt-5 block text-xs text-white/55 transition-colors group-hover:text-white/80">
-                {item.step} →
-              </span>
-            </a>
-          ))}
         </div>
       </section>
 
@@ -393,12 +332,6 @@ export default async function Home() {
           </div>
         </div>
       </section>
-
-      <CommerceWorkflow
-        endpoint={endpoint}
-        price={demoPrice}
-        settlement={settlement}
-      />
 
       <footer className="mx-auto max-w-5xl px-4 pb-16">
         <div className="flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-8 text-xs text-white/50">
