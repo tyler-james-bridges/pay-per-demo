@@ -95,6 +95,12 @@ export default async function Home() {
             pay-per-demo
           </Link>
           <nav className="flex items-center gap-4" aria-label="Service links">
+            <Link
+              className="transition-colors hover:text-white/70"
+              href="/activity"
+            >
+              activity
+            </Link>
             <a
               className="hidden transition-colors hover:text-white/70 sm:inline"
               href="/llms.txt"
@@ -336,6 +342,12 @@ export default async function Home() {
       <footer className="mx-auto max-w-5xl px-4 pb-16">
         <div className="flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-8 text-xs text-white/50">
           <div className="flex flex-wrap gap-4">
+            <Link
+              className="transition-colors hover:text-white/60"
+              href="/activity"
+            >
+              Activity
+            </Link>
             <a
               className="transition-colors hover:text-white/60"
               href="/openapi.json"

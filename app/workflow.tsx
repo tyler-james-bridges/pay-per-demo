@@ -93,16 +93,24 @@ export function CommerceWorkflow({ price, settlement }: CommerceWorkflowProps) {
               </p>
             )}
           </div>
-          {settlement ? (
+          <div className="flex flex-wrap gap-3 text-[10px]">
             <a
-              className="shrink-0 text-[10px] text-green-400 transition-colors hover:text-green-300"
-              href={`https://basescan.org/tx/${settlement.transactionHash}`}
-              target="_blank"
-              rel="noreferrer"
+              className="text-green-400 transition-colors hover:text-green-300"
+              href="/activity"
             >
-              View proof ↗
+              View all transactions →
             </a>
-          ) : null}
+            {settlement ? (
+              <a
+                className="text-white/40 transition-colors hover:text-white/70"
+                href={`https://basescan.org/tx/${settlement.transactionHash}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Latest proof ↗
+              </a>
+            ) : null}
+          </div>
         </footer>
       </div>
     </section>

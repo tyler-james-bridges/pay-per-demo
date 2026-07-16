@@ -26,6 +26,7 @@ describe("CommerceWorkflow", () => {
     expect(html).toContain(
       `https://basescan.org/tx/${settlement.transactionHash}`,
     );
+    expect(html).toContain('href="/activity"');
   });
 
   it("renders the protocol flow in order", () => {

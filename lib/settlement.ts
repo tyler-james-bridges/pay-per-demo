@@ -14,6 +14,7 @@ type RpcLog = {
 type IndexedTransfer = {
   block_number: number;
   from: { hash: string };
+  method: string | null;
   timestamp: string;
   to: { hash: string };
   token: { address_hash: string; decimals: string };
@@ -105,6 +106,9 @@ export function parseIndexedTransfer(
   if (transfer.to.hash.toLowerCase() !== recipient.toLowerCase()) {
     throw new Error("Unexpected indexed recipient");
   }
+  if (transfer.method !== "transferWithAuthorization") {
+    throw new Error("Unexpected indexed method");
+  }
 
   const timestamp = new Date(transfer.timestamp);
   if (Number.isNaN(timestamp.getTime())) throw new Error("Invalid timestamp");
@@ -122,7 +126,7 @@ export function parseIndexedTransfer(
   };
 }
 
-async function getIndexedSettlement(recipient: string) {
+async function getIndexedSettlements(recipient: string, limit: number) {
   const response = await fetch(
     `${BLOCKSCOUT_API_URL}/addresses/${encodeURIComponent(recipient)}/token-transfers?type=ERC-20`,
     { cache: "no-store" },
@@ -133,12 +137,16 @@ async function getIndexedSettlement(recipient: string) {
   if (!Array.isArray(payload.items))
     throw new Error("Invalid Blockscout response");
 
-  const transfer = payload.items.find(
-    (item) =>
-      item.token.address_hash.toLowerCase() === USDC_ADDRESS.toLowerCase() &&
-      item.to.hash.toLowerCase() === recipient.toLowerCase(),
-  );
-  return transfer ? parseIndexedTransfer(transfer, recipient) : null;
+  return payload.items
+    .flatMap((item) => {
+      try {
+        return [parseIndexedTransfer(item, recipient)];
+      } catch {
+        return [];
+      }
+    })
+    .sort((a, b) => b.blockNumber - a.blockNumber)
+    .slice(0, limit);
 }
 
 async function getRecentRpcSettlement(
@@ -171,15 +179,24 @@ async function getRecentRpcSettlement(
   };
 }
 
-export async function getLatestSettlement(
+export async function getRecentSettlements(
   recipient: string,
-): Promise<Settlement | null> {
+  limit = 10,
+): Promise<Settlement[]> {
+  const boundedLimit = Math.max(1, Math.min(limit, 50));
+
   try {
-    const indexed = await getIndexedSettlement(recipient);
-    if (indexed) return indexed;
+    const indexed = await getIndexedSettlements(recipient, boundedLimit);
+    if (indexed.length > 0) return indexed;
   } catch {
-    return getRecentRpcSettlement(recipient);
+    const recent = await getRecentRpcSettlement(recipient);
+    return recent ? [recent] : [];
   }
 
-  return getRecentRpcSettlement(recipient);
+  const recent = await getRecentRpcSettlement(recipient);
+  return recent ? [recent] : [];
+}
+
+export async function getLatestSettlement(recipient: string) {
+  return (await getRecentSettlements(recipient, 1))[0] ?? null;
 }

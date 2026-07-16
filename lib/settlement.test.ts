@@ -1,6 +1,10 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { parseIndexedTransfer, parseTransferLog } from "@/lib/settlement";
+import {
+  getRecentSettlements,
+  parseIndexedTransfer,
+  parseTransferLog,
+} from "@/lib/settlement";
 
 const recipient = "0x0C9DaE48A198f2c0Ab3aB04223C45c98ECF154FB";
 const transferLog = {
@@ -18,6 +22,7 @@ const transferLog = {
 const indexedTransfer = {
   block_number: 48695450,
   from: { hash: "0xf617Eb3CF39E2a584a999b2E559e5653cBc61640" },
+  method: "transferWithAuthorization",
   timestamp: "2026-07-16T05:37:27.000000Z",
   to: { hash: recipient },
   token: {
@@ -28,6 +33,8 @@ const indexedTransfer = {
   transaction_hash:
     "0x14c70a13b1acfd4174ba8a8e832f12cbd7f15c4223737856aeffe79f0a439f43",
 };
+
+afterEach(() => vi.unstubAllGlobals());
 
 describe("parseTransferLog", () => {
   it("parses the real Base USDC transfer shape", () => {
@@ -82,5 +89,40 @@ describe("parseIndexedTransfer", () => {
         recipient,
       ),
     ).toThrow("Unexpected indexed token");
+  });
+
+  it("rejects a non-x402 transfer", () => {
+    expect(() =>
+      parseIndexedTransfer(
+        { ...indexedTransfer, method: "transfer" },
+        recipient,
+      ),
+    ).toThrow("Unexpected indexed method");
+  });
+});
+
+describe("getRecentSettlements", () => {
+  it("returns indexed settlements newest first", async () => {
+    const previousTransfer = {
+      ...indexedTransfer,
+      block_number: 48695394,
+      timestamp: "2026-07-16T05:35:35.000000Z",
+      transaction_hash:
+        "0x99fa30a3bf0adcad788ec661c897349b4e38aaedefe8a1483f557ab8b3cfcda7",
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ items: [previousTransfer, indexedTransfer] }),
+      }),
+    );
+
+    const settlements = await getRecentSettlements(recipient, 2);
+
+    expect(settlements.map((item) => item.transactionHash)).toEqual([
+      indexedTransfer.transaction_hash,
+      previousTransfer.transaction_hash,
+    ]);
   });
 });
