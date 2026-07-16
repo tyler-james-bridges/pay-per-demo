@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
+import { Geist_Mono } from "next/font/google";
 import "./globals.css";
+
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+});
 
 const siteUrl = process.env.BASE_URL ?? "https://pay-per-demo.vercel.app";
 const title = "Pay Per Demo — Send your agent for 1¢";
@@ -40,7 +45,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className={geistMono.className}>
       <body className="min-h-full">{children}</body>
     </html>
   );

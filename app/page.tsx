@@ -19,6 +19,33 @@ async function getOrigin() {
   return `${protocol}://${host}`;
 }
 
+const journey = [
+  {
+    step: "01",
+    title: "Discover",
+    description:
+      "Your agent reads the public OpenAPI and llms.txt instructions before it spends anything.",
+    stat: "No API key",
+    href: "/openapi.json",
+  },
+  {
+    step: "02",
+    title: "Pay",
+    description:
+      "It accepts the x402 challenge and settles exactly 0.01 USDC on Base.",
+    stat: "One request",
+    href: "#agent-command",
+  },
+  {
+    step: "03",
+    title: "Attend",
+    description:
+      "The paid response confirms admission and returns the private virtual join URL.",
+    stat: "No account",
+    href: "#event-title",
+  },
+] as const;
+
 export default async function Home() {
   const origin = await getOrigin();
   const endpoint = `${origin}/api/demo`;
@@ -77,7 +104,7 @@ export default async function Home() {
     : null;
 
   return (
-    <main className="shell">
+    <main className="min-h-screen bg-black text-white">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -85,161 +112,287 @@ export default async function Home() {
         }}
       />
 
-      <header className="topbar">
-        <Link className="identity" href="/" aria-label="Pay Per Demo home">
-          <span className="identity-mark">ppd</span>
-          <span>pay per demo</span>
-        </Link>
-        <nav className="topbar-nav" aria-label="Service links">
-          <a href="/llms.txt">agent view</a>
-          <div className="service-state">
-            <span className="state-dot" aria-hidden="true" />
-            <span>accepting x402</span>
-          </div>
-        </nav>
+      <header className="mx-auto max-w-5xl px-4 pt-6">
+        <div className="flex min-h-10 items-center justify-between gap-4 border-b border-white/10 pb-4 text-xs text-white/50">
+          <Link
+            className="font-bold tracking-tight text-white transition-colors hover:text-white/70"
+            href="/"
+            aria-label="Pay Per Demo home"
+          >
+            pay-per-demo
+          </Link>
+          <nav className="flex items-center gap-4" aria-label="Service links">
+            <a
+              className="hidden transition-colors hover:text-white/70 sm:inline"
+              href="/llms.txt"
+            >
+              agent view
+            </a>
+            <span className="flex items-center gap-2">
+              <i
+                className="h-1.5 w-1.5 rounded-full bg-green-400 shadow-[0_0_0_3px_rgb(74_222_128_/_0.1)]"
+                aria-hidden="true"
+              />
+              accepting x402
+            </span>
+          </nav>
+        </div>
       </header>
 
-      <section className="intro conversion-hero">
-        <div className="hero-copy">
-          <p className="kicker">live service / virtual admission</p>
-          <h1>
-            Send your agent to Demo Day for{" "}
-            <span className="price-accent">{compactPrice}.</span>
-          </h1>
-          <p className="lede">
-            Skip the signup flow. Your agent discovers one paid endpoint,
-            settles in USDC, and returns confirmed admission with the private
-            join URL.
+      <section className="mx-auto max-w-5xl px-4 pt-16 pb-12 md:pt-24 md:pb-14">
+        <div className="text-center">
+          <p className="text-[11px] font-bold tracking-[0.18em] text-white/50 uppercase">
+            live service · agentic commerce demo day
           </p>
-          <div className="hero-actions">
-            <CopyButton label="Copy prompt for my agent" value={agentPrompt} />
-            <a className="secondary-action" href="#agent-command">
-              Use AgentCash CLI
-            </a>
-            <CopyButton label="Copy link" value={origin} variant="secondary" />
-          </div>
-          <ul className="promise-list" aria-label="Service promises">
-            <li>No account</li>
-            <li>No API key</li>
-            <li>No subscription</li>
-          </ul>
+          <h1 className="mt-5 text-5xl font-bold tracking-[-0.055em] md:text-7xl">
+            pay-per-demo
+          </h1>
+          <p className="mx-auto mt-5 max-w-2xl text-xl leading-relaxed text-white/60 md:text-2xl">
+            Send your agent to Demo Day for{" "}
+            <strong className="font-bold text-green-400">{compactPrice}</strong>
+            .
+          </p>
+          <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-white/55">
+            One prompt, one USDC payment, and one private join URL. No signup,
+            subscription, or checkout flow.
+          </p>
         </div>
-
-        <aside className="prompt-card" aria-labelledby="prompt-card-title">
-          <header>
-            <p className="panel-label">ready-to-send instruction</p>
-            <span>human → agent</span>
-          </header>
-          <h2 id="prompt-card-title">Ask your agent, not another checkout.</h2>
-          <blockquote>“{agentPrompt}”</blockquote>
-          <footer>
-            <span>max spend · {demoPrice} USDC</span>
-            <a href="/llms.txt">agent instructions ↗</a>
-          </footer>
-        </aside>
       </section>
 
-      <dl className="event-strip" aria-label="Event access details">
-        <div>
-          <dt>event</dt>
-          <dd>{demoEvent.name}</dd>
-        </div>
-        <div>
-          <dt>date</dt>
-          <dd>
-            <time dateTime={demoEvent.date}>July 16, 2026</time>
-          </dd>
-        </div>
-        <div>
-          <dt>attendance</dt>
-          <dd>
-            {demoEvent.attendance} · from {demoEvent.location}
-          </dd>
-        </div>
-        <div>
-          <dt>paid response unlocks</dt>
-          <dd>Admission + private join URL</dd>
-        </div>
-      </dl>
+      <section
+        className="mx-auto max-w-3xl px-4 pb-16"
+        aria-labelledby="prompt-title"
+      >
+        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5 md:p-6">
+          <div className="flex items-center justify-between gap-4">
+            <h2
+              id="prompt-title"
+              className="text-xs font-bold tracking-wider text-white/50 uppercase"
+            >
+              Ready-to-send prompt
+            </h2>
+            <span className="text-[10px] tracking-wider text-white/50 uppercase">
+              {demoPrice} USDC · Base
+            </span>
+          </div>
 
-      <div className="workspace" id="agent-command">
-        <section className="request" aria-labelledby="endpoint-title">
-          <header className="panel-heading">
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-stretch">
+            <div className="min-w-0 flex-1 rounded-lg border border-white/20 bg-white/5 px-4 py-3 text-sm leading-relaxed text-white/75">
+              <span className="mb-2 block text-[10px] tracking-wider text-white/50 uppercase">
+                human → agent
+              </span>
+              “{agentPrompt}”
+            </div>
+            <CopyButton label="Copy prompt" value={agentPrompt} />
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-white/5 pt-4">
+            <div className="flex flex-wrap gap-x-4 gap-y-2 text-[10px] tracking-wider text-white/50 uppercase">
+              <span>✓ no account</span>
+              <span>✓ no API key</span>
+              <span>✓ max spend set</span>
+            </div>
+            <a
+              className="text-xs text-white/50 transition-colors hover:text-white"
+              href="#agent-command"
+            >
+              Use the CLI instead →
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section
+        className="mx-auto max-w-5xl px-4 pb-16"
+        aria-labelledby="journey-title"
+      >
+        <h2
+          id="journey-title"
+          className="mb-6 text-xs font-bold tracking-wider text-white/50 uppercase"
+        >
+          How it works
+        </h2>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          {journey.map((item) => (
+            <a
+              className="group rounded-xl border border-white/10 bg-white/[0.02] p-6 no-underline transition-colors hover:border-white/25 hover:bg-white/[0.04]"
+              href={item.href}
+              key={item.step}
+            >
+              <div className="mb-4 flex items-start justify-between gap-4">
+                <h3 className="text-lg font-bold tracking-tight">
+                  {item.title}
+                </h3>
+                <span className="text-[10px] tracking-wider text-white/50 uppercase">
+                  {item.stat}
+                </span>
+              </div>
+              <p className="text-sm leading-relaxed text-white/55">
+                {item.description}
+              </p>
+              <span className="mt-5 block text-xs text-white/55 transition-colors group-hover:text-white/80">
+                {item.step} →
+              </span>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <section
+        className="mx-auto max-w-5xl px-4 pb-16"
+        aria-labelledby="event-title"
+      >
+        <h2
+          id="event-title"
+          className="mb-6 text-xs font-bold tracking-wider text-white/50 uppercase"
+        >
+          Event access
+        </h2>
+        <dl className="grid grid-cols-1 overflow-hidden rounded-xl border border-white/10 bg-white/[0.02] sm:grid-cols-2 lg:grid-cols-4">
+          <div className="border-b border-white/5 p-5 sm:border-r lg:border-b-0">
+            <dt className="text-[10px] tracking-wider text-white/50 uppercase">
+              Event
+            </dt>
+            <dd className="mt-2 text-sm leading-relaxed text-white/75">
+              {demoEvent.name}
+            </dd>
+          </div>
+          <div className="border-b border-white/5 p-5 lg:border-r lg:border-b-0">
+            <dt className="text-[10px] tracking-wider text-white/50 uppercase">
+              Date
+            </dt>
+            <dd className="mt-2 text-sm text-white/75">
+              <time dateTime={demoEvent.date}>July 16, 2026</time>
+            </dd>
+          </div>
+          <div className="border-b border-white/5 p-5 sm:border-r sm:border-b-0">
+            <dt className="text-[10px] tracking-wider text-white/50 uppercase">
+              Access
+            </dt>
+            <dd className="mt-2 text-sm text-white/75">
+              {demoEvent.attendance} · {demoEvent.location}
+            </dd>
+          </div>
+          <div className="p-5">
+            <dt className="text-[10px] tracking-wider text-white/50 uppercase">
+              Unlocks
+            </dt>
+            <dd className="mt-2 text-sm text-white/75">
+              Admission + private join URL
+            </dd>
+          </div>
+        </dl>
+      </section>
+
+      <section
+        className="mx-auto max-w-5xl scroll-mt-6 px-4 pb-16"
+        id="agent-command"
+        aria-labelledby="endpoint-title"
+      >
+        <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5 md:p-6">
+          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
             <div>
-              <p className="panel-label">paid endpoint</p>
-              <h2 id="endpoint-title">
-                <span className="method">GET</span>
+              <p className="text-xs font-bold tracking-wider text-white/50 uppercase">
+                x402 paid API
+              </p>
+              <h2
+                id="endpoint-title"
+                className="mt-3 flex flex-wrap items-center gap-3 text-lg font-bold"
+              >
+                <span className="rounded bg-green-500/15 px-2 py-1 text-[11px] text-green-400">
+                  GET
+                </span>
                 <code>/api/demo</code>
               </h2>
+              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/55">
+                Public discovery is free. The private destination is returned
+                only after the one-time payment settles.
+              </p>
             </div>
-            <div className="price">
-              <strong>${demoPrice}</strong>
-              <span>USDC / request</span>
-            </div>
-          </header>
-
-          <div className="command-stack">
-            <div className="command-block">
-              <div className="command-label">
-                <span>01 · discover</span>
-                <CopyButton
-                  label="copy"
-                  value={discoverCommand}
-                  variant="quiet"
-                />
-              </div>
-              <pre>
-                <code>{discoverCommand}</code>
-              </pre>
-            </div>
-
-            <div className="command-block">
-              <div className="command-label">
-                <span>02 · pay + attend</span>
-                <CopyButton label="copy" value={command} variant="quiet" />
-              </div>
-              <pre>
-                <code>{command}</code>
-              </pre>
+            <div className="shrink-0 text-left sm:text-right">
+              <strong className="block text-lg text-green-400">
+                ${demoPrice}
+              </strong>
+              <span className="mt-1 block text-[10px] tracking-wider text-white/50 uppercase">
+                USDC / request
+              </span>
             </div>
           </div>
 
-          <dl className="endpoint-meta">
-            <div>
-              <dt>protocol</dt>
-              <dd>x402 exact</dd>
-            </div>
-            <div>
-              <dt>network</dt>
-              <dd>Base · eip155:8453</dd>
-            </div>
-            <div>
-              <dt>asset</dt>
-              <dd>USDC</dd>
-            </div>
-            <div>
-              <dt>response</dt>
-              <dd>application/json</dd>
-            </div>
-          </dl>
-        </section>
+          <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(17rem,0.65fr)]">
+            <div className="grid min-w-0 gap-3">
+              <div className="overflow-hidden rounded-lg border border-white/10 bg-black/60">
+                <div className="flex items-center justify-between gap-3 border-b border-white/5 px-4 py-3 text-[10px] tracking-wider text-white/50 uppercase">
+                  <span>01 · discover</span>
+                  <CopyButton
+                    label="Copy"
+                    value={discoverCommand}
+                    variant="quiet"
+                  />
+                </div>
+                <pre className="overflow-x-auto p-4 text-xs leading-relaxed text-white/75">
+                  <code>{discoverCommand}</code>
+                </pre>
+              </div>
 
-        <aside className="response-card" aria-labelledby="response-title">
-          <p className="panel-label">paid response</p>
-          <h2 id="response-title">What comes back</h2>
-          <p className="response-copy">
-            The public schema is visible before payment. The private destination
-            appears only after settlement succeeds.
-          </p>
-          <pre className="response-preview">
-            <code>{responsePreview}</code>
-          </pre>
-          <div className="discovery-links">
-            <a href="/openapi.json">openapi.json</a>
-            <a href="/llms.txt">llms.txt</a>
+              <div className="overflow-hidden rounded-lg border border-white/10 bg-black/60">
+                <div className="flex items-center justify-between gap-3 border-b border-white/5 px-4 py-3 text-[10px] tracking-wider text-white/50 uppercase">
+                  <span>02 · pay + attend</span>
+                  <CopyButton label="Copy" value={command} variant="quiet" />
+                </div>
+                <pre className="overflow-x-auto p-4 text-xs leading-relaxed text-white/75">
+                  <code>{command}</code>
+                </pre>
+              </div>
+
+              <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {[
+                  ["protocol", "x402 exact"],
+                  ["network", "Base"],
+                  ["asset", "USDC"],
+                  ["response", "JSON"],
+                ].map(([label, value]) => (
+                  <div
+                    className="rounded-lg border border-white/5 bg-white/[0.02] px-4 py-3"
+                    key={label}
+                  >
+                    <dt className="text-[9px] tracking-wider text-white/50 uppercase">
+                      {label}
+                    </dt>
+                    <dd className="mt-1 text-xs text-white/65">{value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+
+            <aside className="min-w-0 rounded-lg border border-white/10 bg-black/60 p-4">
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="text-xs font-bold tracking-wider text-white/50 uppercase">
+                  Paid response
+                </h3>
+                <span className="text-[10px] text-green-400">200</span>
+              </div>
+              <pre className="mt-4 overflow-x-auto text-[11px] leading-relaxed text-white/55">
+                <code>{responsePreview}</code>
+              </pre>
+              <div className="mt-4 flex flex-wrap gap-3 border-t border-white/5 pt-4 text-xs text-white/50">
+                <a
+                  className="transition-colors hover:text-white"
+                  href="/openapi.json"
+                >
+                  openapi.json
+                </a>
+                <a
+                  className="transition-colors hover:text-white"
+                  href="/llms.txt"
+                >
+                  llms.txt
+                </a>
+              </div>
+            </aside>
           </div>
-        </aside>
-      </div>
+        </div>
+      </section>
 
       <CommerceWorkflow
         endpoint={endpoint}
@@ -247,10 +400,32 @@ export default async function Home() {
         settlement={settlement}
       />
 
-      <footer className="footer">
-        <span>pay per demo</span>
-        <span>@agentcash/router 1.18.0</span>
-        <span>Base mainnet</span>
+      <footer className="mx-auto max-w-5xl px-4 pb-16">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-8 text-xs text-white/50">
+          <div className="flex flex-wrap gap-4">
+            <a
+              className="transition-colors hover:text-white/60"
+              href="/openapi.json"
+            >
+              OpenAPI
+            </a>
+            <a
+              className="transition-colors hover:text-white/60"
+              href="/llms.txt"
+            >
+              Agent instructions
+            </a>
+            <a
+              className="transition-colors hover:text-white/60"
+              href="https://agentcash.dev"
+              target="_blank"
+              rel="noreferrer"
+            >
+              AgentCash
+            </a>
+          </div>
+          <span>pay-per-demo.vercel.app</span>
+        </div>
       </footer>
     </main>
   );
