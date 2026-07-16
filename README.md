@@ -55,6 +55,14 @@ Inspect the unpaid challenge with curl:
 curl -i http://localhost:3000/api/demo
 ```
 
+## Recording Demo
+
+The recording-safe demo performs a real `$0.01` production payment, prints a redacted result, and opens the paid destination without exposing its URL:
+
+```bash
+npm run demo
+```
+
 ## Verification
 
 ```bash
