@@ -65,7 +65,7 @@ export function CommerceWorkflow({
 
       <div className="flow-stage" key={run}>
         <div className="flow-packet" aria-hidden="true">
-          $0.01
+          ${price}
         </div>
         <ol className="flow-steps">
           {steps.map(([title, detail], index) => (
