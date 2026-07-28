@@ -5,11 +5,11 @@ import { getRecentSettlements, type Settlement } from "@/lib/settlement";
 
 export const metadata: Metadata = {
   title: "Transaction Activity | Pay Per Demo",
-  description: "Verified x402 settlement activity for Pay Per Demo on Base.",
+  description: "Verified USDC receipt activity for Pay Per Demo on Base.",
   alternates: { canonical: "/activity" },
   openGraph: {
     title: "Transaction Activity | Pay Per Demo",
-    description: "Verified x402 settlement activity for Pay Per Demo on Base.",
+    description: "Verified USDC receipt activity for Pay Per Demo on Base.",
     url: "/activity",
   },
 };
@@ -64,16 +64,15 @@ export default async function ActivityPage() {
 
       <section className="mx-auto max-w-5xl px-4 pt-12 pb-8 md:pt-20">
         <p className="text-[10px] font-bold tracking-[0.18em] text-white/50 uppercase">
-          public settlement log
+          public wallet receipt log
         </p>
         <div className="mt-4 grid gap-5 md:grid-cols-[minmax(0,1fr)_minmax(18rem,0.55fr)] md:items-end">
           <div>
             <h1 className="text-4xl font-bold tracking-[-0.045em] md:text-6xl">
-              Paid request activity.
+              Wallet receipt activity.
             </h1>
             <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/55">
-              Each row is a verified USDC settlement to the Pay Per Demo wallet
-              for <code>GET /api/demo</code>.
+              Each row is a verified USDC transfer to the Pay Per Demo wallet.
             </p>
           </div>
           <p className="text-xs leading-relaxed text-white/40 md:text-right">
@@ -124,7 +123,7 @@ export default async function ActivityPage() {
           <div className="overflow-hidden rounded-xl border border-white/10 bg-white/[0.02]">
             <div className="hidden grid-cols-[1.45fr_1fr_1fr_0.7fr_0.9fr] gap-4 border-b border-white/10 px-4 py-3 text-[9px] tracking-wider text-white/40 uppercase md:grid">
               <span>Settled</span>
-              <span>Request</span>
+              <span>Asset</span>
               <span>Payer</span>
               <span>Amount</span>
               <span className="text-right">Transaction</span>
@@ -151,10 +150,10 @@ export default async function ActivityPage() {
                   </div>
                   <div>
                     <span className="text-[9px] tracking-wider text-white/40 uppercase md:hidden">
-                      Request
+                      Asset
                     </span>
                     <code className="mt-1 block text-xs text-white/65 md:mt-0">
-                      GET /api/demo
+                      USDC / Base
                     </code>
                   </div>
                   <div>

@@ -4,7 +4,10 @@ import { spawn } from "node:child_process";
 import process from "node:process";
 import { pathToFileURL } from "node:url";
 
-const endpoint = "https://pay-per-demo.vercel.app/api/demo";
+const isOverflow = process.env.DEMO_KIND === "overflow";
+const endpoint =
+  process.env.DEMO_ENDPOINT?.trim() ||
+  `https://pay-per-demo.vercel.app/api/${isOverflow ? "overflow" : "demo"}`;
 const origin = new URL(endpoint).origin;
 
 const sleep = (milliseconds) =>
@@ -31,9 +34,11 @@ function capture(command, args) {
   });
 }
 
-export function summarizeDiscovery(result) {
+export function summarizeDiscovery(result, expectedPath) {
   const discovery = result.data ?? result;
-  const route = discovery.endpoints?.[0];
+  const route = expectedPath
+    ? discovery.endpoints?.find((endpoint) => endpoint.path === expectedPath)
+    : discovery.endpoints?.[0];
   if (!discovery.found || !route) {
     throw new Error("AgentCash did not discover the paid route");
   }
@@ -50,12 +55,15 @@ export function summarizeDiscovery(result) {
   };
 }
 
-export function summarizeResult(result) {
+export function summarizeResult(result, { requirePrototype = false } = {}) {
   if (!result?.success) {
     throw new Error(result?.error?.message ?? "AgentCash payment failed");
   }
+  if (requirePrototype && result.data.prototype?.official !== false) {
+    throw new Error("Paid result is not labeled as an unofficial prototype");
+  }
 
-  const joinUrl = new URL(result.data.joinUrl);
+  const joinUrl = new URL(result.data.roomUrl ?? result.data.joinUrl);
   if (joinUrl.protocol !== "https:") {
     throw new Error("Paid destination must use HTTPS");
   }
@@ -63,7 +71,8 @@ export function summarizeResult(result) {
   return {
     joinUrl: joinUrl.toString(),
     summary: {
-      admission: result.data.admission,
+      admission: result.data.access ?? result.data.admission,
+      ...(requirePrototype ? { official: false } : {}),
       event: result.data.event.name,
       amount: result.data.payment.amount,
       currency: result.data.payment.currency,
@@ -101,8 +110,12 @@ function openPaidDestination(joinUrl) {
 
 async function main() {
   console.clear();
-  console.log("PAY PER DEMO");
-  console.log("agent -> x402 -> Base -> admission");
+  console.log(isOverflow ? "PAY PER DEMO / OVERFLOW" : "PAY PER DEMO");
+  console.log(
+    isOverflow
+      ? "capacity > x402 > Base > private prototype room"
+      : "agent -> x402 -> Base -> admission",
+  );
   console.log("\nStarting live flow in 3 seconds...");
   await sleep(3_000);
 
@@ -115,7 +128,10 @@ async function main() {
     "--format",
     "json",
   ]);
-  const discovery = summarizeDiscovery(JSON.parse(discoveryOutput));
+  const discovery = summarizeDiscovery(
+    JSON.parse(discoveryOutput),
+    new URL(endpoint).pathname,
+  );
   console.log(`${discovery.title} via ${discovery.source}`);
   console.log(`${discovery.method} ${discovery.path}`);
   console.log(
@@ -131,7 +147,7 @@ async function main() {
   console.log(`Network: ${challenge.network} (Base)`);
   await sleep(1_500);
 
-  section("03 / PAY + ATTEND");
+  section(isOverflow ? "03 / PAY + UNLOCK" : "03 / PAY + ATTEND");
   console.log("AgentCash is signing and settling the x402 payment...");
   const output = await capture("npx", [
     "agentcash@latest",
@@ -148,20 +164,34 @@ async function main() {
     "json",
   ]);
 
-  const { joinUrl, summary } = summarizeResult(JSON.parse(output));
-  console.log("HTTP 200 Admission Confirmed");
-  console.log(`Event: ${summary.event}`);
+  const { joinUrl, summary } = summarizeResult(JSON.parse(output), {
+    requirePrototype: isOverflow,
+  });
+  console.log(
+    isOverflow
+      ? "HTTP 200 Prototype Access Confirmed"
+      : "HTTP 200 Admission Confirmed",
+  );
+  console.log(`${isOverflow ? "Context" : "Event"}: ${summary.event}`);
+  if (isOverflow) console.log("Official event access: no");
   console.log(`Payment: $${summary.amount} ${summary.currency} on Base`);
   console.log(`BaseScan: https://basescan.org/tx/${summary.transactionHash}`);
   await sleep(2_000);
 
   section("04 / FULFILL");
-  console.log("Opening the paid destination without exposing its URL...");
+  console.log(
+    isOverflow
+      ? "Opening the private prototype room without exposing its URL..."
+      : "Opening the paid destination without exposing its URL...",
+  );
   console.log("No signup. No API key. No subscription.");
   await sleep(1_500);
   openPaidDestination(joinUrl);
 
   section("@agentcash/router");
+  if (isOverflow) {
+    console.log("Independent prototype, not an official event ticket.");
+  }
   console.log("x402 now. MPP, SIWX, sessions, and metering when needed.");
 }
 

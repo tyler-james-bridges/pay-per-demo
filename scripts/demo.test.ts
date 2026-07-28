@@ -19,6 +19,19 @@ const paidResult = {
   },
 };
 
+const overflowResult = {
+  ...paidResult,
+  data: {
+    ...paidResult.data,
+    admission: undefined,
+    access: "prototype_confirmed",
+    prototype: { official: false },
+    event: { name: "Merit Systems + Circle event" },
+    joinUrl: undefined,
+    roomUrl: "https://meet.google.com/overflow-room",
+  },
+};
+
 const discoveryResult = {
   success: true,
   data: {
@@ -51,6 +64,24 @@ describe("summarizeDiscovery", () => {
       protocol: "x402",
     });
   });
+
+  it("selects the requested route when discovery returns both demos", () => {
+    const overflowRoute = {
+      ...discoveryResult.data.endpoints[0],
+      path: "/api/overflow",
+    };
+    const result = {
+      ...discoveryResult,
+      data: {
+        ...discoveryResult.data,
+        endpoints: [...discoveryResult.data.endpoints, overflowRoute],
+      },
+    };
+
+    expect(summarizeDiscovery(result, "/api/overflow").path).toBe(
+      "/api/overflow",
+    );
+  });
 });
 
 describe("summarizeResult", () => {
@@ -66,6 +97,27 @@ describe("summarizeResult", () => {
       amount: "0.01",
       network: "eip155:8453",
     });
+  });
+
+  it("validates and redacts the overflow prototype room", () => {
+    const result = summarizeResult(overflowResult, {
+      requirePrototype: true,
+    });
+
+    expect(result.joinUrl).toBe(overflowResult.data.roomUrl);
+    expect(JSON.stringify(result.summary)).not.toContain(
+      overflowResult.data.roomUrl,
+    );
+    expect(result.summary).toMatchObject({
+      admission: "prototype_confirmed",
+      official: false,
+    });
+  });
+
+  it("rejects overflow results that imply official access", () => {
+    expect(() =>
+      summarizeResult(paidResult, { requirePrototype: true }),
+    ).toThrow("not labeled as an unofficial prototype");
   });
 
   it("rejects unsuccessful payments", () => {

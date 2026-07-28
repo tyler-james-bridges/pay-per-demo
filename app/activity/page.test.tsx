@@ -46,9 +46,9 @@ describe("ActivityPage", () => {
 
     const html = renderToStaticMarkup(await ActivityPage());
 
-    expect(html).toContain("Paid request activity.");
+    expect(html).toContain("Wallet receipt activity.");
     expect(html).toContain("0.02 USDC");
-    expect(html).toContain("GET /api/demo");
+    expect(html).toContain("USDC / Base");
     expect(html).toContain(
       `https://basescan.org/tx/${latestTransfer.transaction_hash}`,
     );

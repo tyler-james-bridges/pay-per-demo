@@ -1,16 +1,17 @@
 # Pay Per Demo
 
-An x402-gated virtual admission endpoint for Agentic Commerce Demo Day. A caller pays once in USDC on Base and receives confirmed admission without an account, API key, or subscription.
+An agent pays USDC over x402 and unlocks a private virtual event room. The home page presents the current overflow prototype first and preserves the original Agentic Commerce Demo Day flow as a reference.
 
 Built with Next.js and [`@agentcash/router`](https://github.com/merit-systems/agentcash-router).
 
 ## Endpoint
 
-```text
-GET /api/demo
-```
+| Priority  | Paid endpoint       | Experiment                             |
+| --------- | ------------------- | -------------------------------------- |
+| Current   | `GET /api/overflow` | July 29 virtual-overflow prototype     |
+| Reference | `GET /api/demo`     | July 16 Agentic Commerce Demo Day flow |
 
-An unpaid request receives HTTP `402` with the x402 challenge in the `PAYMENT-REQUIRED` header. A paid request receives the event, payer, payment, and optional join URL details.
+An unpaid request receives HTTP `402` with the x402 challenge in the `PAYMENT-REQUIRED` header. A paid request receives its experiment-specific event, payer, payment, and private URL details.
 
 Discovery is available at:
 
@@ -34,8 +35,12 @@ Set these required values in `.env.local`:
 
 Optional configuration:
 
-- `DEMO_PRICE_USDC`: Defaults to `0.01`.
+- `DEMO_PRICE_USDC`: Price for the original `/api/demo`; defaults to `0.01`.
 - `DEMO_JOIN_URL`: HTTPS URL returned only after successful payment.
+- `OVERFLOW_ROOM_URL`: Private room for `/api/overflow`. Falls back to `DEMO_JOIN_URL`.
+
+The `/api/overflow` price is fixed at `0.01` USDC.
+Without a configured room, it returns HTTP `503` without issuing a payment challenge.
 
 Then run:
 
@@ -47,6 +52,7 @@ Call the paid endpoint with AgentCash:
 
 ```bash
 npx agentcash fetch http://localhost:3000/api/demo
+npx agentcash fetch http://localhost:3000/api/overflow
 ```
 
 Inspect the unpaid challenge with curl:
@@ -57,10 +63,11 @@ curl -i http://localhost:3000/api/demo
 
 ## Recording Demo
 
-The recording-safe demo performs a real `$0.01` production payment, prints a redacted result, and opens the paid destination without exposing its URL:
+Each recording-safe demo performs a real `$0.01` production payment, prints a redacted result, and opens the paid destination without exposing its URL:
 
 ```bash
 npm run demo
+npm run demo:overflow
 ```
 
 ## Verification
