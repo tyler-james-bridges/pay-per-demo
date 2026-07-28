@@ -1,6 +1,7 @@
 import type { Settlement } from "@/lib/settlement";
 
 type CommerceWorkflowProps = {
+  accessDetail?: string;
   price: string;
   settlement: Settlement | null;
 };
@@ -16,7 +17,11 @@ function formatTimestamp(value: string) {
   return `${value.slice(0, 16).replace("T", " ")} UTC`;
 }
 
-export function CommerceWorkflow({ price, settlement }: CommerceWorkflowProps) {
+export function CommerceWorkflow({
+  accessDetail = "Private join URL",
+  price,
+  settlement,
+}: CommerceWorkflowProps) {
   return (
     <section
       className="mx-auto max-w-4xl px-4 pb-8"
@@ -56,7 +61,11 @@ export function CommerceWorkflow({ price, settlement }: CommerceWorkflowProps) {
                 {step.title}
               </strong>
               <code className="mt-1 block text-[10px] leading-relaxed text-white/50">
-                {step.title === "Pay" ? `${price} USDC · Base` : step.detail}
+                {step.title === "Pay"
+                  ? `${price} USDC · Base`
+                  : step.title === "Access"
+                    ? accessDetail
+                    : step.detail}
               </code>
               {index < steps.length - 1 ? (
                 <span
@@ -79,11 +88,11 @@ export function CommerceWorkflow({ price, settlement }: CommerceWorkflowProps) {
                   aria-hidden="true"
                 />
               ) : null}
-              Latest real settlement
+              Latest wallet receipt
             </span>
             {settlement ? (
               <p className="mt-1.5 text-[10px] text-white/55">
-                {settlement.amount} USDC confirmed on Base · block{" "}
+                {settlement.amount} USDC received on Base · block{" "}
                 {settlement.blockNumber.toLocaleString("en-US")} ·{" "}
                 {formatTimestamp(settlement.timestamp)}
               </p>
@@ -98,7 +107,7 @@ export function CommerceWorkflow({ price, settlement }: CommerceWorkflowProps) {
               className="text-green-400 transition-colors hover:text-green-300"
               href="/activity"
             >
-              View all transactions →
+              View wallet activity →
             </a>
             {settlement ? (
               <a
@@ -107,7 +116,7 @@ export function CommerceWorkflow({ price, settlement }: CommerceWorkflowProps) {
                 target="_blank"
                 rel="noreferrer"
               >
-                Latest proof ↗
+                Receipt proof ↗
               </a>
             ) : null}
           </div>

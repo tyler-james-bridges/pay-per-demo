@@ -20,7 +20,7 @@ describe("CommerceWorkflow", () => {
       <CommerceWorkflow price="0.01" settlement={settlement} />,
     );
 
-    expect(html).toContain("0.01 USDC confirmed on Base");
+    expect(html).toContain("0.01 USDC received on Base");
     expect(html).toContain("48,695,450");
     expect(html).toContain("2026-07-16 05:37 UTC");
     expect(html).toContain(

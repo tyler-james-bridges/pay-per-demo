@@ -7,9 +7,9 @@ const geistMono = Geist_Mono({
 });
 
 const siteUrl = process.env.BASE_URL ?? "https://pay-per-demo.vercel.app";
-const title = "Pay Per Demo — Send your agent for 1¢";
+const title = "Pay Per Demo | Agent-paid virtual event access";
 const description =
-  "Send an AI agent to Agentic Commerce Demo Day with one 0.01 USDC payment on Base. No account, API key, or subscription.";
+  "An agent pays USDC over x402 and unlocks a private virtual event room.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

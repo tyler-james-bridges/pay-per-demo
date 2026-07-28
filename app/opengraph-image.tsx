@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Pay Per Demo — Send your agent to Demo Day for 1¢";
+export const alt = "Pay Per Demo agent-paid virtual event access";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -31,7 +31,7 @@ export default function OpenGraphImage() {
           textTransform: "uppercase",
         }}
       >
-        Agentic Commerce Demo Day · accepting x402
+        x402 · virtual event access
       </div>
       <div
         style={{
@@ -48,14 +48,16 @@ export default function OpenGraphImage() {
       <div
         style={{
           display: "flex",
+          width: 950,
+          justifyContent: "center",
           marginTop: 30,
           color: "rgba(255,255,255,0.58)",
-          fontSize: 32,
+          fontSize: 30,
           lineHeight: 1.35,
+          textAlign: "center",
         }}
       >
-        Send your agent to Demo Day for&nbsp;
-        <span style={{ color: "#4ade80", fontWeight: 700 }}>1¢.</span>
+        An agent pays USDC over x402 and unlocks a private virtual event room.
       </div>
       <div
         style={{
@@ -70,8 +72,8 @@ export default function OpenGraphImage() {
           fontSize: 18,
         }}
       >
-        <span>July 16, 2026 · virtual</span>
-        <span>0.01 USDC · Base</span>
+        <span>current · /api/overflow</span>
+        <span>reference · /api/demo</span>
       </div>
     </div>,
     size,

@@ -1,6 +1,6 @@
 import { createRouterFromEnv, type RouterPlugin } from "@agentcash/router";
 
-import { demoPrice } from "@/lib/config";
+import { demoPrice, overflowPrice } from "@/lib/config";
 
 const loggingPlugin: RouterPlugin = {
   onAlert(_context, alert) {
@@ -18,10 +18,11 @@ export const router = createRouterFromEnv({
   title: "Pay Per Demo",
   serviceName: "Pay Per Demo",
   description:
-    "Pay once to attend Agentic Commerce Demo Day virtually, without an account or subscription.",
+    "x402-gated virtual event access prototypes without accounts or subscriptions.",
   guidance:
+    `GET /api/overflow costs $${overflowPrice} USDC and unlocks an unofficial prototype room. ` +
     `GET /api/demo costs $${demoPrice} USDC on Base via x402. ` +
-    "The paid response confirms admission and includes the configured virtual join URL.",
-  tags: ["events", "demos", "virtual-attendance", "x402", "base"],
+    "Paid responses include the configured private URL.",
+  tags: ["events", "virtual-attendance", "overflow", "x402", "base"],
   plugin: loggingPlugin,
 });
