@@ -2,6 +2,8 @@ import { createRouterFromEnv, type RouterPlugin } from "@agentcash/router";
 
 import { demoPrice, overflowPrice } from "@/lib/config";
 
+const BASE_BUILDER_CODE = "bc_jhxtiha3";
+
 const loggingPlugin: RouterPlugin = {
   onAlert(_context, alert) {
     const log = alert.level === "error" ? console.error : console.warn;
@@ -15,6 +17,11 @@ const loggingPlugin: RouterPlugin = {
 };
 
 export const router = createRouterFromEnv({
+  env: {
+    ...process.env,
+    X402_BUILDER_CODE:
+      process.env.X402_BUILDER_CODE ?? BASE_BUILDER_CODE,
+  },
   title: "Pay Per Demo",
   serviceName: "Pay Per Demo",
   description:
